@@ -1,0 +1,20 @@
+name: deploy to aws
+on:
+  release:
+    types: [published]
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment: production
+    steps:
+      - uses: appleboy/ssh-action@823bd89e131d8d508129f9443cad5855e9ba96f0
+        with:
+          host: ${{ secrets.AWS_EC2_HOST }}
+          username: ${{ secrets.AWS_EC2_USER }}
+          key: ${{ secrets.AWS_EC2_KEY }}
+          script: |
+            cd /home/ec2-user/gac.final
+            git pull origin main
+            npm ci
+            npm run build
+            p2m restart all
